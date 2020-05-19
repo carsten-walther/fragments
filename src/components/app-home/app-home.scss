@@ -1,0 +1,26 @@
+label {
+  display: block;
+  padding: 0;
+  margin: 0 0 1em 0;
+}
+
+textarea {
+  padding: 0;
+  margin: 0 0 1em 0;
+  box-sizing: border-box;
+  border: 1px solid #BBBBBB;
+  width: 100%;
+  min-height: 150px;
+  resize: none;
+}
+
+button {
+  padding: 0.75em 1.25em;
+  margin: 0 1px 0 1px;
+  min-width: 100px;
+  line-height: 1em;
+  color: #FFFFFF;
+  background: #2196F3;
+  border: 1px solid #2196F3;
+  border-radius: 0.25em;
+}
