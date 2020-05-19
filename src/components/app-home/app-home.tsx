@@ -1,4 +1,6 @@
-import { Component, Prop, h } from '@stencil/core';
+import { Component, Prop, State, h } from '@stencil/core'
+import Shake from 'shake.js'
+
 
 @Component({
   tag: 'app-home',
@@ -8,7 +10,24 @@ import { Component, Prop, h } from '@stencil/core';
 
 export class AppHome {
 
-  @Prop() value: string
+  @Prop() value: string = ''
+  @Prop() disabled: boolean = true
+
+  @State() shakeEvent: Shake = null
+
+  componentWillLoad() {
+    // https://github.com/alexgibson/shake.js
+    this.shakeEvent = new Shake({
+      //threshold: 15, // optional shake strength threshold
+      //timeout: 1000 // optional, determines the frequency of event generation
+    }).start()
+
+    window.addEventListener('shake', this.shakeEventDidOccur, false);
+  }
+
+  shakeEventDidOccur() {
+    alert('shake!')
+  }
 
   shakeWords(words) {
     let array = words.split(' ')
@@ -38,6 +57,10 @@ export class AppHome {
   handleChange(event) {
     event.preventDefault()
     this.value = event.target.value;
+    this.disabled = true
+    if (this.value.split(' ').length > 1) {
+      this.disabled = false
+    }
   }
 
   copyToClipboard(event) {
@@ -58,11 +81,13 @@ export class AppHome {
   render() {
     return (
       <form>
-        <label class='align-center'>Your text</label>
+        <label>Your text</label>
         <textarea name='text' placeholder='Type text here...' onInput={event => this.handleChange(event)} value={this.value}>{this.value}</textarea>
-        <div class='align-center'>
-          <button onClick={event => this.handleSubmit(event)}>Shake it!</button>
-          <button onClick={event => this.copyToClipboard(event)}>Copy that!</button>
+        <div class='align-right'>
+          <button onClick={event => this.handleSubmit(event)} disabled={this.disabled}>Shake it!</button>
+        </div>
+        <div class='align-right'>
+          <button onClick={event => this.copyToClipboard(event)} disabled={this.disabled}>Copy that!</button>
         </div>
       </form>
     );

@@ -7,9 +7,11 @@
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
 export namespace Components {
     interface AppHome {
+        "disabled": boolean;
         "value": string;
     }
     interface AppRoot {
+        "requestPermission": boolean;
     }
 }
 declare global {
@@ -32,9 +34,11 @@ declare global {
 }
 declare namespace LocalJSX {
     interface AppHome {
+        "disabled"?: boolean;
         "value"?: string;
     }
     interface AppRoot {
+        "requestPermission"?: boolean;
     }
     interface IntrinsicElements {
         "app-home": AppHome;

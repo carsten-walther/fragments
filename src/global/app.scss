@@ -8,12 +8,21 @@
   Any global CSS variables should also be applied here.
 */
 
+* {
+  outline: none;
+  border: none;
+  margin: 0;
+  padding: 0;
+  font-family: 'Open Sans', sans-serif;
+}
 
 body {
   margin: 0;
   padding: 0;
-  font-family: 'Open Sans', sans-serif;
-  color: #333333;
+  color: #FFFFFF;
+  background-color: #333333;
+  background-image: url('/assets/inflicted.png');
+  background-repeat: repeat;
 }
 
 .align-center {

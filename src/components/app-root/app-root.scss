@@ -1,40 +1,35 @@
 .container {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  width: 300px;
-  padding: 0;
-  margin: 0;
-  transform: translateX(-50%) translateY(-50%);
+  padding: 2em;
+  margin: 0 auto;
+  max-width: 920px;
 }
 
 header {
   padding: 0;
-  margin: 0 0 1em 0;
-  font-family: 'Permanent Marker', cursive;
+  margin: 0;
 
   h1 {
     padding: 0;
-    margin: 0;
-    font-size: 1.5em;
+    margin: 0 0 1em 0;
+    font-size: 2em;
+    font-family: 'Permanent Marker', cursive;
   }
 }
 
 main {
-  padding: 1em;
+  padding: 0;
   margin: 0;
-  box-shadow: 0 0 0.5em #BBBBBB;
-  border-radius: 0.5em;
+  font-family: 'Permanent Marker', cursive;
 }
 
 footer {
   padding: 0;
-  margin: 1em 0 0 0;
+  margin: 3em 0 0 0;
 
   p {
     padding: 0;
     margin: 0;
-    font-size: 0.666666em;
+    font-size: 0.75em;
     color: #BBBBBB;
   }
 }
