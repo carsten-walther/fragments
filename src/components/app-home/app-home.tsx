@@ -1,5 +1,6 @@
 import { Component, Prop, State, h } from '@stencil/core'
 import Shake from 'shake.js'
+import fs from 'fs'
 
 
 @Component({
@@ -71,11 +72,38 @@ export class AppHome {
       return;
     }
 
-    navigator.clipboard.writeText(this.value).then(() => {
-      console.log('Async: Copying to clipboard was successful!')
+    let copyright = '\nPowered by http://fragments.carstenwalther.de/'
+
+    navigator.clipboard.writeText(this.value + copyright).then(() => {
+      console.info('Async: Copying to clipboard was successful!')
     }, (err) => {
       console.error('Async: Could not copy text: ', err)
     })
+
+    this.storeToFile(this.value + copyright)
+  }
+
+  uuid_v4() {
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
+  }
+
+  storeToFile(text) {
+    let fileName = '/assets/data/storage.json'
+    let uuid = this.uuid_v4()
+
+    fetch(fileName)
+      .then(response => response.json())
+      .then((json) => {
+        json.push({
+          uuid: uuid,
+          text: text
+        })
+        fs.writeFile(fileName, json);
+        console.log(fileName, json)
+      })
   }
 
   render() {

@@ -17,6 +17,7 @@
   },
   "license": "MIT",
   "dependencies": {
+    "fs": "0.0.1-security",
     "shake.js": "^1.2.2"
   }
 }

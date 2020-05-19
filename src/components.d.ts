@@ -11,7 +11,6 @@ export namespace Components {
         "value": string;
     }
     interface AppRoot {
-        "requestPermission": boolean;
     }
 }
 declare global {
@@ -38,7 +37,6 @@ declare namespace LocalJSX {
         "value"?: string;
     }
     interface AppRoot {
-        "requestPermission"?: boolean;
     }
     interface IntrinsicElements {
         "app-home": AppHome;
