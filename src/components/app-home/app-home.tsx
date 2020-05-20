@@ -1,7 +1,5 @@
-import { Component, Prop, State, h } from '@stencil/core'
-import Shake from 'shake.js'
-import fs from 'fs'
-
+import { Component, Prop, h } from '@stencil/core'
+import { MatchResults } from '@stencil/router';
 
 @Component({
   tag: 'app-home',
@@ -11,23 +9,15 @@ import fs from 'fs'
 
 export class AppHome {
 
+  @Prop() match: MatchResults
   @Prop() value: string = ''
+  @Prop() original: string = ''
   @Prop() disabled: boolean = true
 
-  @State() shakeEvent: Shake = null
-
-  componentWillLoad() {
-    // https://github.com/alexgibson/shake.js
-    this.shakeEvent = new Shake({
-      //threshold: 15, // optional shake strength threshold
-      //timeout: 1000 // optional, determines the frequency of event generation
-    }).start()
-
-    window.addEventListener('shake', this.shakeEventDidOccur, false);
-  }
-
-  shakeEventDidOccur() {
-    alert('shake!')
+  componentDidLoad() {
+    if (this.match.params.uuid) {
+      this.value = this.getText(this.match.params.uuid)
+    }
   }
 
   shakeWords(words) {
@@ -52,12 +42,16 @@ export class AppHome {
 
   handleSubmit(event) {
     event.preventDefault()
-    this.value = this.shakeWords(this.value)
+
+    this.original = this.value
+    this.value = this.shakeWords(this.original)
   }
 
   handleChange(event) {
     event.preventDefault()
+
     this.value = event.target.value;
+
     this.disabled = true
     if (this.value.split(' ').length > 1) {
       this.disabled = false
@@ -67,43 +61,74 @@ export class AppHome {
   copyToClipboard(event) {
     event.preventDefault()
 
+    let uuid = ''
+
     if (!navigator.clipboard) {
       alert(this.value)
       return;
     }
 
-    let copyright = '\nPowered by http://fragments.carstenwalther.de/'
+    let copyright = '\nPowered by ' + location.protocol + '//' + location.hostname
+
+    if (this.original) {
+      uuid = this.setText(this.original)
+    }
+
+    copyright = copyright + ' (' + location.protocol + '//' + location.hostname + '/' + uuid + ')'
 
     navigator.clipboard.writeText(this.value + copyright).then(() => {
       console.info('Async: Copying to clipboard was successful!')
     }, (err) => {
       console.error('Async: Could not copy text: ', err)
     })
-
-    this.storeToFile(this.value + copyright)
   }
 
-  uuid_v4() {
-    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-      var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
-      return v.toString(16);
-    });
+  setText(text) {
+    let uuid = ''
+
+    let url = new URL(location.protocol + '//' + location.hostname + ':4444/assets/php/storage.php')
+    let params = { text: text }
+
+    fetch(url.href, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: "POST",
+      body: JSON.stringify(params)
+    }).then(data => data.json()).then((data) => {
+    uuid = data.uuid
+      console.log('request succeeded with JSON response', data)
+    }).catch(function (error) {
+      console.log('request failed', error)
+    })
+
+    return uuid
   }
 
-  storeToFile(text) {
-    let fileName = '/assets/data/storage.json'
-    let uuid = this.uuid_v4()
+  getText(uuid) {
+    let text = ''
 
-    fetch(fileName)
-      .then(response => response.json())
-      .then((json) => {
-        json.push({
-          uuid: uuid,
-          text: text
-        })
-        fs.writeFile(fileName, json);
-        console.log(fileName, json)
-      })
+    let url = new URL(location.protocol + '//' + location.hostname + ':4444/assets/php/storage.php')
+    let params = { uuid: uuid }
+
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
+
+    fetch(url.href, {
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json'
+      },
+      method: 'GET',
+      body: ''
+    }).then(data => data.json()).then((data) => {
+      text = data.text
+      console.log('request succeeded with JSON response', data)
+    }).catch(function (error) {
+      console.log('request failed', error)
+    })
+
+    return text
   }
 
   render() {
