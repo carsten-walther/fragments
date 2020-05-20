@@ -25,6 +25,10 @@ body {
   background-repeat: repeat;
 }
 
+p {
+  font-family: 'Permanent Marker', cursive;
+}
+
 .align-center {
   text-align: center;
 }
@@ -35,4 +39,24 @@ body {
 
 .align-right {
   text-align: right;
+}
+
+.float-right {
+  float: right !important;
+}
+
+.float-left {
+  float: left !important;
+}
+
+.clearfix {
+  &:before {
+    display: table;
+    content: " ";
+  }
+  &:after {
+    display: table;
+    content: " ";
+    clear: both;
+  }
 }

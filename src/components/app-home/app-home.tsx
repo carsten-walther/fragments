@@ -11,6 +11,7 @@ export class AppHome {
 
   @Prop() match: MatchResults
   @Prop() value: string = ''
+  @Prop() uuid: string = ''
   @Prop() original: string = ''
   @Prop() disabled: boolean = true
 
@@ -61,32 +62,25 @@ export class AppHome {
   copyToClipboard(event) {
     event.preventDefault()
 
-    let uuid = ''
+    if (this.original) {
+      this.setText(this.original)
+    }
+
+    this.value = this.value + '\n\nPowered by ' + location.protocol + '//' + location.hostname + '/' + this.uuid
 
     if (!navigator.clipboard) {
-      alert(this.value)
-      return;
+      alert('Sorry, copy to clipboard not available in your browser!')
+    } else {
+      navigator.clipboard.writeText(this.value).then(() => {
+        console.info('Async: Copying to clipboard was successful!')
+      }, (err) => {
+        console.error('Async: Could not copy text: ', err)
+      })
     }
-
-    let copyright = '\nPowered by ' + location.protocol + '//' + location.hostname
-
-    if (this.original) {
-      uuid = this.setText(this.original)
-    }
-
-    copyright = copyright + ' (' + location.protocol + '//' + location.hostname + '/' + uuid + ')'
-
-    navigator.clipboard.writeText(this.value + copyright).then(() => {
-      console.info('Async: Copying to clipboard was successful!')
-    }, (err) => {
-      console.error('Async: Could not copy text: ', err)
-    })
   }
 
   setText(text) {
-    let uuid = ''
-
-    let url = new URL(location.protocol + '//' + location.hostname + ':4444/assets/php/storage.php')
+    let url = new URL(location.protocol + '//' + location.hostname + '/assets/php/storage.php')
     let params = { text: text }
 
     fetch(url.href, {
@@ -97,19 +91,17 @@ export class AppHome {
       method: "POST",
       body: JSON.stringify(params)
     }).then(data => data.json()).then((data) => {
-    uuid = data.uuid
+      this.uuid = data.uuid
       console.log('request succeeded with JSON response', data)
     }).catch(function (error) {
       console.log('request failed', error)
     })
-
-    return uuid
   }
 
   getText(uuid) {
     let text = ''
 
-    let url = new URL(location.protocol + '//' + location.hostname + ':4444/assets/php/storage.php')
+    let url = new URL(location.protocol + '//' + location.hostname + '/assets/php/storage.php')
     let params = { uuid: uuid }
 
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
@@ -136,11 +128,19 @@ export class AppHome {
       <form>
         <label>Your text</label>
         <textarea name='text' placeholder='Type text here...' onInput={event => this.handleChange(event)} value={this.value}>{this.value}</textarea>
-        <div class='align-right'>
-          <button onClick={event => this.handleSubmit(event)} disabled={this.disabled}>Shake it!</button>
-        </div>
-        <div class='align-right'>
-          <button onClick={event => this.copyToClipboard(event)} disabled={this.disabled}>Copy that!</button>
+        <div>
+          <div class='float-left'>
+            <p>Enter your text.<br/>click "Shake it!".<br/>Then "Copy that!".<br/>Have fun!</p>
+          </div>
+          <div class='float-right'>
+            <div class='align-right'>
+              <button onClick={event => this.handleSubmit(event)} disabled={this.disabled}>Shake it!</button>
+            </div>
+            <div class='align-right'>
+              <button onClick={event => this.copyToClipboard(event)} disabled={this.disabled}>Copy that!</button>
+            </div>
+          </div>
+          <div class='clearfix'></div>
         </div>
       </form>
     );
