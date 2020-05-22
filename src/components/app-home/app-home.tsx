@@ -69,8 +69,16 @@ export class AppHome {
     this.value = this.value + '\n\nPowered by ' + location.protocol + '//' + location.hostname + '/' + this.uuid
 
     if (!navigator.clipboard) {
-      alert('Sorry, copy to clipboard not available in your browser!')
+      // okay, we have to use an workaround,
+      // because navigator.clipboard is not available
+      const el = document.createElement('textarea');
+      el.value = this.value;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
     } else {
+      // we have navigator.clipboard available
       navigator.clipboard.writeText(this.value).then(() => {
         console.info('Async: Copying to clipboard was successful!')
       }, (err) => {
