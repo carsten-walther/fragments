@@ -11,15 +11,7 @@ export class AppHome {
 
   @Prop() match: MatchResults
   @Prop() value: string = ''
-  @Prop() uuid: string = ''
-  @Prop() original: string = ''
   @Prop() disabled: boolean = true
-
-  componentDidLoad() {
-    if (this.match.params.uuid) {
-      this.value = this.getText(this.match.params.uuid)
-    }
-  }
 
   shakeWords(words) {
     let array = words.split(' ')
@@ -44,39 +36,38 @@ export class AppHome {
   handleSubmit(event) {
     event.preventDefault()
 
-    this.original = this.value
-    this.value = this.shakeWords(this.original)
+    this.value = this.shakeWords(this.value)
   }
 
   handleChange(event) {
     event.preventDefault()
 
     this.value = event.target.value;
-
-    this.disabled = true
-    if (this.value.split(' ').length > 1) {
-      this.disabled = false
-    }
+    this.disabled = this.value.split(' ').length <= 1;
   }
 
   copyToClipboard(event) {
     event.preventDefault()
 
-    if (this.original) {
-      this.setText(this.original)
-    }
-
-    this.value = this.value + '\n\nPowered by ' + location.protocol + '//' + location.hostname + '/' + this.uuid
+    this.value = this.value + '\n\nPowered by ' + location.protocol + '//' + location.hostname + '/'
 
     if (!navigator.clipboard) {
       // okay, we have to use an workaround,
       // because navigator.clipboard is not available
-      const el = document.createElement('textarea');
-      el.value = this.value;
-      document.body.appendChild(el);
-      el.select();
-      document.execCommand('copy');
-      document.body.removeChild(el);
+      const el = document.createElement('textarea')
+      el.value = this.value
+      el.setAttribute('readonly', '')
+      el.style.position = 'absolute'
+      el.style.left = '-9999px'
+      document.body.appendChild(el)
+      const selected = document.getSelection().rangeCount > 0 ? document.getSelection().getRangeAt(0) : false
+      el.select()
+      document.execCommand('copy')
+      document.body.removeChild(el)
+      if (selected) {
+        document.getSelection().removeAllRanges()
+        document.getSelection().addRange(selected)
+      }
     } else {
       // we have navigator.clipboard available
       navigator.clipboard.writeText(this.value).then(() => {
@@ -85,50 +76,6 @@ export class AppHome {
         console.error('Async: Could not copy text: ', err)
       })
     }
-  }
-
-  setText(text) {
-    let url = new URL(location.protocol + '//' + location.hostname + '/assets/php/storage.php')
-    let params = { text: text }
-
-    fetch(url.href, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: "POST",
-      body: JSON.stringify(params)
-    }).then(data => data.json()).then((data) => {
-      this.uuid = data.uuid
-      console.log('request succeeded with JSON response', data)
-    }).catch(function (error) {
-      console.log('request failed', error)
-    })
-  }
-
-  getText(uuid) {
-    let text = ''
-
-    let url = new URL(location.protocol + '//' + location.hostname + '/assets/php/storage.php')
-    let params = { uuid: uuid }
-
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]))
-
-    fetch(url.href, {
-      headers: {
-        'Accept': 'application/json',
-        'Content-Type': 'application/json'
-      },
-      method: 'GET',
-      body: ''
-    }).then(data => data.json()).then((data) => {
-      text = data.text
-      console.log('request succeeded with JSON response', data)
-    }).catch(function (error) {
-      console.log('request failed', error)
-    })
-
-    return text
   }
 
   render() {

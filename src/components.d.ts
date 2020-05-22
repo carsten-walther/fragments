@@ -10,8 +10,6 @@ export namespace Components {
     interface AppHome {
         "disabled": boolean;
         "match": MatchResults;
-        "original": string;
-        "uuid": string;
         "value": string;
     }
     interface AppRoot {
@@ -39,8 +37,6 @@ declare namespace LocalJSX {
     interface AppHome {
         "disabled"?: boolean;
         "match"?: MatchResults;
-        "original"?: string;
-        "uuid"?: string;
         "value"?: string;
     }
     interface AppRoot {
